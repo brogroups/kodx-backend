@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  username String @unique
+  phone    String @unique
+  password String
+
+  role Role
+
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  comments   Comment[]
+  likes      Like[]
+  likesVideo LikeVideo[]
+}
+
+model Video {
+  id String @id @default(cuid())
+
+  name            String
+  url             String
+  duration        String?
+  description     String
+  sub_description String
+  private         Boolean @default(false)
+  is_payment      Boolean @default(false)
+
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  comments   Comment[]
+  likesVideo LikeVideo[]
+}
+
+model Comment {
+  id String @id @default(cuid())
+
+  video    Video  @relation(fields: [video_id], references: [id])
+  video_id String
+
+  comment String
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  likes      Like[]
+}
+
+model Like {
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id])
+
+  @@id([userId, commentId])
+}
+
+model LikeVideo {
+  userId    String
+  videoId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  video Video @relation(fields: [videoId], references: [id])
+
+  @@id([userId, videoId])
+}
+
+enum Role {
+  user
+  admin
+}
