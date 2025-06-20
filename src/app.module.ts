@@ -11,10 +11,7 @@ import { LikeModule } from './like/like.module';
   imports: [
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    CacheModule.register({
-      ttl: 3600,
-      isGlobal: true,
-    }),
+    CacheModule.register(),
     UserModule,
     VideoModule,
     CommentModule,

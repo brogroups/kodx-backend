@@ -5,6 +5,7 @@ import { UserService } from './user/user.service';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 9000;
@@ -44,9 +45,10 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
+  
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, 
+      transform: true,
     }),
   );
 

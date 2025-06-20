@@ -143,6 +143,6 @@ export class VideoController {
   @Auth()
   @Admin()
   delete(@Param('id') id: string) {
-    return this.videoService.findOne(id);
+    return this.videoService.delete(id);
   }
 }

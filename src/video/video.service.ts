@@ -1,6 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { VideoDto } from './video.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class VideoService {
@@ -46,11 +52,12 @@ export class VideoService {
       },
     });
   }
+
   async update(dto: Partial<VideoDto>, id: string, url: string) {
     const video = await this.findOne(id);
 
     if (!video) throw new NotFoundException('video not found');
-
+    this.deleteVideo(video.url);
     return this.prisma.video.update({
       where: {
         id,
@@ -67,10 +74,22 @@ export class VideoService {
     const video = await this.findOne(id);
 
     if (!video) throw new NotFoundException('video not found');
+    await this.deleteVideo(video.url);
     return this.prisma.video.delete({
       where: {
         id,
       },
+    });
+  }
+
+  private deleteVideo(Videopath: string) {
+    const url = path.join(process.cwd(), Videopath);
+    fs.unlink(url, (err) => {
+      if (err) {
+        console.error(err);
+        throw new InternalServerErrorException('Delete video err');
+      }
+      console.log('Video deleted');
     });
   }
 }
